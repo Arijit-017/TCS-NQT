@@ -73,11 +73,30 @@ export default function AdminDashboard() {
         <div className="bg-white p-4 rounded shadow">
           <h3 className="font-bold mb-3">Users</h3>
 
-          {users.map((u) => (
-            <div key={u.id} className="border p-2 mb-2">
-              {u.email}
-            </div>
-          ))}
+          <div className="space-y-3">
+            {users.map((u) => {
+              const solvedCount = u.solvedProblems?.length || 0;
+
+              return (
+                <div
+                  key={u.id}
+                  className="flex justify-between items-center border p-3 rounded-lg bg-gray-50 hover:bg-gray-100 transition"
+                >
+                  <div>
+                    <p className="font-semibold text-gray-800">
+                      {u.name || "No Name"}
+                    </p>
+
+                    <p className="text-sm text-gray-500">{u.email}</p>
+                  </div>
+
+                  <div className="text-sm font-bold bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full">
+                    {solvedCount} Solved
+                  </div>
+                </div>
+              );
+            })}
+          </div>
         </div>
       </div>
     </div>

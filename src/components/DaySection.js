@@ -1,29 +1,46 @@
+import { useState } from "react";
 import QuestionCard from "./QuestionCard";
 
-export default function DaySection({day,questions,solved,toggle}){
+export default function DaySection({ day, questions, solved, toggle }) {
 
- return(
+  const [open, setOpen] = useState(false);
 
- <div className="mb-6">
+  return (
+    <div className="mb-4 border rounded-xl bg-white shadow-sm">
 
-   <h2 className="text-lg font-bold mb-2">
-     Day {day}
-   </h2>
+      {/* Day Header */}
+      <div
+        onClick={() => setOpen(!open)}
+        className="flex justify-between items-center cursor-pointer p-4 hover:bg-gray-50"
+      >
+        <h2 className="text-lg font-bold">
+          Day {day}
+        </h2>
 
-   <div className="space-y-2">
+        {/* Arrow Icon */}
+        <span
+          className={`text-xl transition-transform duration-200 ${
+            open ? "rotate-180" : ""
+          }`}
+        >
+          ▼
+        </span>
+      </div>
 
-     {questions.map(q=>(
-       <QuestionCard
-         key={q.id}
-         q={q}
-         solved={solved.includes(q.id)}
-         toggle={toggle}
-       />
-     ))}
+      {/* Questions Dropdown */}
+      {open && (
+        <div className="p-4 border-t space-y-3">
+          {questions.map((q) => (
+            <QuestionCard
+              key={q.id}
+              q={q}
+              solved={solved.includes(q.id)}
+              toggle={toggle}
+            />
+          ))}
+        </div>
+      )}
 
-   </div>
-
- </div>
-
- )
+    </div>
+  );
 }
