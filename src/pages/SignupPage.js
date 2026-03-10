@@ -9,6 +9,7 @@ export default function SignupPage() {
   const [name,setName] = useState("");
   const [email,setEmail] = useState("");
   const [password,setPassword] = useState("");
+  const [loading,setLoading] = useState(false);
 
   const navigate = useNavigate();
 
@@ -16,25 +17,52 @@ export default function SignupPage() {
 
   const signup = async () => {
 
-    const res = await createUserWithEmailAndPassword(auth,email,password);
+    if(!name || !email || !password){
+      alert("Please fill all fields");
+      return;
+    }
 
-    // Save name in Firebase Auth profile
-    await updateProfile(res.user,{
-      displayName: name
-    });
+    try{
 
-    // Save user in Firestore
-    await createUserProfile(res.user.uid,email,name);
+      setLoading(true);
 
-    if(email === ADMIN_EMAIL){
-      navigate("/admin-dashboard");
-    } else {
-      navigate("/dashboard");
+      const res = await createUserWithEmailAndPassword(
+        auth,
+        email.trim(),
+        password
+      );
+
+      // save name to Firebase Auth
+      await updateProfile(res.user,{
+        displayName: name.trim()
+      });
+
+      // save user profile in Firestore
+      await createUserProfile(
+        res.user.uid,
+        email.trim(),
+        name.trim()
+      );
+
+      // redirect based on role
+      if(email.trim() === ADMIN_EMAIL){
+        navigate("/admin-dashboard");
+      } else {
+        navigate("/dashboard");
+      }
+
+    }catch(error){
+
+      alert(error.message);
+
+    }finally{
+      setLoading(false);
     }
 
   };
 
   return(
+
   <div className="flex items-center justify-center h-screen bg-gray-100">
 
     <div className="bg-white p-8 shadow rounded w-96">
@@ -60,20 +88,22 @@ export default function SignupPage() {
       <input
         type="password"
         placeholder="Password"
-        className="border p-2 w-full mb-3"
+        className="border p-2 w-full mb-4"
         value={password}
         onChange={(e)=>setPassword(e.target.value)}
       />
 
       <button
         onClick={signup}
-        className="bg-green-600 text-white w-full py-2 rounded hover:bg-green-700"
+        disabled={loading}
+        className="bg-green-600 text-white w-full py-2 rounded hover:bg-green-700 disabled:opacity-50"
       >
-        Signup
+        {loading ? "Creating account..." : "Signup"}
       </button>
 
     </div>
 
   </div>
-  )
+
+  );
 }
